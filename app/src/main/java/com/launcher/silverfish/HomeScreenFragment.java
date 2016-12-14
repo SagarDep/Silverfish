@@ -57,6 +57,7 @@ public class HomeScreenFragment extends Fragment  {
     //region Fields
 
     LauncherSQLiteHelper sqlHelper;
+    private Settings settings;
 
     // Constant variables for communication with AppWidgetManager
     final private int WIDGET_HOST_ID = 1339;
@@ -86,6 +87,7 @@ public class HomeScreenFragment extends Fragment  {
                              Bundle savedInstanceState) {
 
         sqlHelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
+        settings = new Settings(getContext());
 
         // Initiate global variables
         mAppWidgetManager = AppWidgetManager.getInstance(getActivity().getBaseContext());
@@ -93,7 +95,7 @@ public class HomeScreenFragment extends Fragment  {
         mAppWidgetHost.startListening();
 
         mPacMan = getActivity().getPackageManager();
-        appsList = new ArrayList<AppDetail>();
+        appsList = new ArrayList<>();
 
         rootView = inflater.inflate(R.layout.activity_home, container, false);
         // Set touch slop and listen for touch events, such as swipe
@@ -129,6 +131,12 @@ public class HomeScreenFragment extends Fragment  {
         updateShortcuts();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setWidgetVisibility(settings.isWidgetVisible());
     }
 
     @Override
@@ -318,7 +326,7 @@ public class HomeScreenFragment extends Fragment  {
         widget_area.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                selectWidget();
+                popupSelectWidget();
                 return true;
             }
         });
@@ -330,8 +338,7 @@ public class HomeScreenFragment extends Fragment  {
 
     //region Widget selection
 
-    private void selectWidget() {
-
+    public void popupSelectWidget() {
         // Allocate widget id and start widget selection activity
         int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
@@ -473,7 +480,7 @@ public class HomeScreenFragment extends Fragment  {
         hostView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                selectWidget();
+                popupSelectWidget();
                 return true;
             }
         });
@@ -536,7 +543,7 @@ public class HomeScreenFragment extends Fragment  {
         }
     }
 
-    View.OnTouchListener onRootTouchListener = new View.OnTouchListener() {
+    final View.OnTouchListener onRootTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent event) {
             switch(MotionEventCompat.getActionMasked(event)) {
@@ -556,6 +563,11 @@ public class HomeScreenFragment extends Fragment  {
     //endregion
 
     //region UI
+
+    public void setWidgetVisibility(boolean visible) {
+        FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
+        widgetArea.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
 
     void updateTouchDown(MotionEvent event) {
         lastX = event.getX();

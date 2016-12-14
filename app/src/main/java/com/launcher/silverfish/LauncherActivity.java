@@ -21,11 +21,9 @@ package com.launcher.silverfish;
 
 import android.content.ClipDescription;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.DragEvent;
@@ -41,7 +39,8 @@ import java.util.List;
 /**
  * This is the main activity of the launcher
  */
-public class LauncherActivity extends FragmentActivity {
+public class LauncherActivity extends FragmentActivity
+        implements SettingsScreenFragment.SettingChanged {
 
     //region Fields
 
@@ -50,6 +49,9 @@ public class LauncherActivity extends FragmentActivity {
 
     // Used for telling home screen when a shortcut is added.
     private ShortcutAddListener shortcutAddListener;
+
+    // Used when the intent is created to specify an starting page index
+    public static final String START_PAGE = "start_page";
 
     //endregion
 
@@ -61,12 +63,9 @@ public class LauncherActivity extends FragmentActivity {
 
         // Check if the app is started for the first time. If it is then we have to
         // populate the database with some default values.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean previouslyStarted = prefs.getBoolean(getString(R.string.pref_previously_started), false);
-        if(!previouslyStarted) {
-            SharedPreferences.Editor edit = prefs.edit();
-            edit.putBoolean(getString(R.string.pref_previously_started), Boolean.TRUE);
-            edit.apply();
+        Settings settings = new Settings(this);
+        if (!settings.wasPreviouslyStarted()) {
+            settings.setPreviouslyStarted(true);
             createDefaultTabs();
             autoSortApplications();
         }
@@ -77,10 +76,9 @@ public class LauncherActivity extends FragmentActivity {
                         getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mCollectionPagerAdapter);
-        mViewPager.setCurrentItem(1);
+        mViewPager.setCurrentItem(getIntent().getIntExtra(START_PAGE, 1));
 
         setDragListener();
-
     }
 
     //endregion
@@ -129,6 +127,24 @@ public class LauncherActivity extends FragmentActivity {
 
         // Then add all the apps to their corresponding tabs at once
         sql.addAppsToTab(pkg_categoryId);
+    }
+
+    //endregion
+
+    //region Fragment communication
+
+    @Override
+    public void onWidgetVisibilityChanged(boolean visible) {
+        getHomeScreenFragment().setWidgetVisibility(visible);
+    }
+
+    @Override
+    public void onWidgetChangeRequested() {
+        getHomeScreenFragment().popupSelectWidget();
+    }
+
+    HomeScreenFragment getHomeScreenFragment() {
+        return (HomeScreenFragment)mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
     }
 
     //endregion

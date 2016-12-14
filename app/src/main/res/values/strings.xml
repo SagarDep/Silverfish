@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name" translatable="false">Silverfish</string>
-    <string name="pref_previously_started" translatable="false">pref_previously_started</string>
-    <string name="pref_last_open_tab" translatable="false">pref_last_open_tab</string>
 
     <string name="text_hold_to_change_widget">Hold to change widget</string>
     <string name="text_empty_category_notice">This tab is currently empty. You can move apps between tabs by dragging them.</string>
@@ -30,4 +28,13 @@
     <string name="text_new_tab_name">Enter new tab name</string>
     <string name="text_move_tab">Move</string>
     <string name="text_move_tab_toast">Please tap the tab to be swapped, or the same to cancel</string>
+    <string name="widget_now_visible">The widget is now visible.</string>
+    <string name="widget_now_invisible">The widget has been hidden.</string>
+    <string name="widget">Widget</string>
+    <string name="toggle_widget_visibility">Toggle widget visibility</string>
+    <string name="text_settings_screen">Settings screen</string>
+    <string name="select_wallpaper">Select wallpaper</string>
+    <string name="change_wallpaper">Change wallpaper</string>
+    <string name="wallpaper">Wallpaper</string>
+    <string name="app_icon">Application icon</string>
 </resources>
